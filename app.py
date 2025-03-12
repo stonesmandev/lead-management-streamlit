@@ -7,7 +7,7 @@ import io
 
 # Initialize session state
 if 'leads' not in st.session_state:
-    st.session_state.leads =# Corrected line
+    st.session_state.leads =
 
 # Function to download CSV
 def download_csv():
