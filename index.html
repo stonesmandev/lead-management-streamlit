@@ -5,20 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lead Management System</title>
     <style>
-        /* General Styles */
+        /* Your existing CSS styles here */
         body {
             font-family: 'Inter', Arial, sans-serif;
             background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
             box-sizing: border-box;
         }
 
-        /* Glassmorphic Container */
         .glass-container {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -26,7 +25,7 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             padding: 30px;
-            width: 100%;
+            width: 90%;
             max-width: 600px;
         }
 
@@ -36,8 +35,7 @@
             margin-bottom: 20px;
         }
 
-        /* Input Fields */
-        input {
+        input, select, textarea {
             margin: 10px 0;
             padding: 12px;
             width: calc(100% - 24px);
@@ -49,13 +47,12 @@
             color: #333;
         }
 
-        input::placeholder {
+        input::placeholder, textarea::placeholder {
             color: #666;
         }
 
-        /* Buttons */
         button {
-            margin: 10px 0;
+            margin: 10px 5px;
             padding: 12px 24px;
             background: rgba(0, 123, 255, 0.8);
             color: white;
@@ -70,7 +67,6 @@
             background: rgba(0, 123, 255, 1);
         }
 
-        /* Table */
         table {
             width: 100%;
             margin: 20px 0;
@@ -95,6 +91,7 @@
         tr:hover {
             background: rgba(255, 255, 255, 0.3);
         }
+
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
@@ -105,65 +102,88 @@
             <input type="text" id="name" placeholder="Name" required>
             <input type="email" id="email" placeholder="Email" required>
             <input type="tel" id="phone" placeholder="Phone" required>
+            <select id="assignedTo" required>
+                <option value="">Assign To</option>
+                <option value="Joshua">Joshua</option>
+                <option value="Joseph">Joseph</option>
+                <option value="Nettie">Nettie</option>
+            </select>
+            <select id="location" required>
+                <option value="">Location</option>
+                <option value="Bedfordview Frontier">Bedfordview Frontier</option>
+                <option value="Royce Heights">Royce Heights</option>
+            </select>
+            <select id="source" required>
+                <option value="">Lead Source</option>
+                <option value="Social Media">Social Media</option>
+                <option value="Walk-in">Walk-in</option>
+                <option value="Google">Google</option>
+                <option value="Referral">Referral</option>
+                <option value="Property24">Property24</option>
+            </select>
+            <select id = "status" required>
+                <option value = "">Lead Status</option>
+                <option value = "New">New</option>
+                <option value = "Contacted">Contacted</option>
+                <option value = "Qualified">Qualified</option>
+                <option value = "Negotiation">Negotiation</option>
+                <option value = "Closed - Won">Closed - Won</option>
+                <option value = "Closed - Lost">Closed - Lost</option>
+            </select>
+            <textarea id = "notes" placeholder = "Lead Notes"></textarea>
+            <input type="datetime-local" id="reminderDateTime" required>
             <button type="submit">Add Lead</button>
+            <button type = "button" onclick = "resetForm()">Clear Form</button>
         </form>
         <button onclick="downloadCSV()">Download Leads</button>
+        <button onclick="downloadICS()">Download Reminder</button>
+        <button onclick="shareWhatsApp()">Share Reminder (WhatsApp)</button>
         <table id="leadsTable">
             <thead>
                 <tr>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
+                    <th>Assigned To</th>
+                    <th>Location</th>
+                    <th>Source</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                    <th>Reminder</th>
                 </tr>
             </thead>
             <tbody>
                 </tbody>
         </table>
     </div>
-
     <script>
-        // Load leads from local storage
         let leads = JSON.parse(localStorage.getItem("leads")) || [];
-
-        // Function to render leads in the table
         function renderLeads() {
             const tbody = document.querySelector("#leadsTable tbody");
             tbody.innerHTML = leads.map(lead => `
                 <tr>
-                    <td>${lead.name}</td>
-                    <td>${lead.email}</td>
-                    <td>${lead.phone}</td>
+                    <td><span class="math-inline">\{lead\.name\}</td\>
+<td\></span>{lead.email}</td>
+                    <td><span class="math-inline">\{lead\.phone\}</td\>
+<td\></span>{lead.assignedTo}</td>
+                    <td><span class="math-inline">\{lead\.location\}</td\>
+<td\></span>{lead.source}</td>
+                    <td><span class="math-inline">\{lead\.status\}</td\>
+<td\></span>{lead.notes}</td>
+                    <td>${lead.reminderDateTime}</td>
                 </tr>
             `).join("");
         }
-
-        // Add a new lead
+        function resetForm(){
+            document.getElementById("leadForm").reset()
+        }
         document.getElementById("leadForm").addEventListener("submit", (e) => {
             e.preventDefault();
             const name = document.getElementById("name").value;
             const email = document.getElementById("email").value;
             const phone = document.getElementById("phone").value;
-            const newLead = { name, email, phone };
-            leads.push(newLead);
-            localStorage.setItem("leads", JSON.stringify(leads));
-            renderLeads();
-            document.getElementById("leadForm").reset();
-        });
-
-        // Download leads as CSV
-        function downloadCSV() {
-            const csvContent = "data:text/csv;charset=utf-8,"
-                + leads.map(lead => `${lead.name},${lead.email},${lead.phone}`).join("\n");
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "leads.csv");
-            document.body.appendChild(link);
-            link.click();
-        }
-
-        // Render leads on page load
-        renderLeads();
-    </script>
-</body>
-</html>
+            const assignedTo = document.getElementById("assignedTo").value;
+            const location = document.getElementById("location").value;
+            const source = document.getElementById("source").value;
+            const status = document.getElementById("status").value;
+            const notes = document.getElementById("notes").value;
