@@ -16,7 +16,6 @@
             align-items: center;
             box-sizing: border-box;
         }
-
         .glass-container {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -27,13 +26,11 @@
             width: 90%;
             max-width: 600px;
         }
-
         h1 {
             color: #333;
             font-size: 2rem;
             margin-bottom: 20px;
         }
-
         input, select, textarea {
             margin: 10px 0;
             padding: 12px;
@@ -45,11 +42,9 @@
             font-size: 1rem;
             color: #333;
         }
-
         input::placeholder, textarea::placeholder {
             color: #666;
         }
-
         button {
             margin: 10px 5px;
             padding: 12px 24px;
@@ -61,11 +56,9 @@
             font-size: 1rem;
             transition: background 0.3s ease;
         }
-
         button:hover {
             background: rgba(0, 123, 255, 1);
         }
-
         table {
             width: 100%;
             margin: 20px 0;
@@ -75,22 +68,18 @@
             border-radius: 10px;
             overflow: hidden;
         }
-
         th, td {
             padding: 12px;
             text-align: left;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         th {
             background: rgba(0, 123, 255, 0.8);
             color: white;
         }
-
         tr:hover {
             background: rgba(255, 255, 255, 0.3);
         }
-
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
@@ -193,7 +182,4 @@
             renderLeads();
             document.getElementById("leadForm").reset();
         });
-        function downloadCSV() {
-            const csvContent = "data:text/csv;charset=utf-8," +
-                ["Name", "Email", "Phone", "Assigned To", "Location", "Source", "Status", "Notes", "Reminder"].join(",") + "\n" +
-                leads.map(lead => [lead.name, lead.email,
+        function downloadCSV
