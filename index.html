@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lead Management System (Simplified)</title>
+    <title>Lead Management System (Enhanced)</title>
     <style>
+        /* CSS Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        /* Your existing CSS styles here */
         body {
             font-family: 'Inter', Arial, sans-serif;
             background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
@@ -16,7 +24,6 @@
             align-items: center;
             box-sizing: border-box;
         }
-
         .glass-container {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -27,14 +34,14 @@
             width: 90%;
             max-width: 600px;
         }
-
         h1 {
             color: #333;
             font-size: 2rem;
             margin-bottom: 20px;
         }
-
-        input, select, textarea {
+        input,
+        select,
+        textarea {
             margin: 10px 0;
             padding: 12px;
             width: calc(100% - 24px);
@@ -45,11 +52,10 @@
             font-size: 1rem;
             color: #333;
         }
-
-        input::placeholder, textarea::placeholder {
+        input::placeholder,
+        textarea::placeholder {
             color: #666;
         }
-
         button {
             margin: 10px 5px;
             padding: 12px 24px;
@@ -61,11 +67,9 @@
             font-size: 1rem;
             transition: background 0.3s ease;
         }
-
         button:hover {
             background: rgba(0, 123, 255, 1);
         }
-
         table {
             width: 100%;
             margin: 20px 0;
@@ -75,27 +79,37 @@
             border-radius: 10px;
             overflow: hidden;
         }
-
-        th, td {
+        th,
+        td {
             padding: 12px;
             text-align: left;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         th {
             background: rgba(0, 123, 255, 0.8);
             color: white;
         }
-
         tr:hover {
             background: rgba(255, 255, 255, 0.3);
+        }
+        #upload-status {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="glass-container">
-        <h1>Lead Management System (Simplified)</h1>
+        <h1>Lead Management System (Enhanced)</h1>
         <form id="leadForm">
             <input type="text" id="name" placeholder="Name" required>
             <input type="email" id="email" placeholder="Email" required>
@@ -126,12 +140,16 @@
                 <option value="Qualified">Qualified</option>
                 <option value="Negotiation">Negotiation</option>
                 <option value="Closed - Won">Closed - Won</option>
-                <option value="Closed - Lost">Closed - Lost</option>
+                <option value="Closed - Lost</option>
             </select>
             <textarea id="notes" placeholder="Lead Notes"></textarea>
             <button type="submit">Add Lead</button>
             <button type="button" onclick="resetForm()">Clear Form</button>
         </form>
+        <input type="file" id="uploadLeads" accept=".csv">
+        <div id="upload-status"></div>
+        <button onclick="downloadCSV()">Download Leads</button>
+        <button onclick="generateReminderLink()">Generate Reminder Link</button>
         <table id="leadsTable">
             <thead>
                 <tr>
@@ -150,7 +168,9 @@
         </table>
     </div>
     <script>
-        let leads = JSON.parse(localStorage.getItem("leads")) || [];
+        let leads = JSON.parse(localStorage.getItem("leads")) ||;
+        renderLeads();
+
         function renderLeads() {
             const tbody = document.querySelector("#leadsTable tbody");
             tbody.innerHTML = leads.map(lead => `
@@ -166,9 +186,11 @@
                 </tr>
             `).join("");
         }
+
         function resetForm() {
             document.getElementById("leadForm").reset();
         }
+
         document.getElementById("leadForm").addEventListener("submit", (e) => {
             e.preventDefault();
             const name = document.getElementById("name").value;
@@ -179,13 +201,135 @@
             const source = document.getElementById("source").value;
             const status = document.getElementById("status").value;
             const notes = document.getElementById("notes").value;
-            const newLead = { name, email, phone, assignedTo, location, source, status, notes };
+
+            // Simple email validation
+            if (!email.includes("@")) {
+                alert("Invalid email format");
+                return;
+            }
+
+            const newLead = {
+                name,
+                email,
+                phone,
+                assignedTo,
+                location,
+                source,
+                status,
+                notes
+            };
             leads.push(newLead);
             localStorage.setItem("leads", JSON.stringify(leads));
             renderLeads();
             document.getElementById("leadForm").reset();
         });
-        renderLeads();
+
+        function downloadCSV() {
+            if (leads.length === 0) {
+                alert("No leads to download.");
+                return;
+            }
+
+            const csvContent = "data:text/csv;charset=utf-8," +
+                ["Name", "Email", "Phone", "Assigned To", "Location", "Source", "Status", "Notes"].join(",") + "\n" +
+                leads.map(lead => [lead.name, lead.email, lead.phone, lead.assignedTo, lead.location, lead.source, lead.status, lead.notes].join(",")).join("\n");
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "leads.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function generateReminderLink() {
+            const reminderText = prompt("Enter reminder text:");
+            if (reminderText) {
+                // Basic URL encoding of the reminder text
+                const encodedReminderText = encodeURIComponent(reminderText);
+                const reminderLink = `https://www.google.com/calendar/render?action=TEMPLATE&text=Reminder:%20${encodedReminderText}`;
+                navigator.clipboard.writeText(reminderLink).then(() => {
+                    alert("Reminder link copied to clipboard!");
+                });
+            }
+        }
+
+        function uploadLeads(event) {
+            const file = event.target.files[0];
+            const statusDiv = document.getElementById("upload-status");
+
+            if (!file) {
+                statusDiv.textContent = "No file selected.";
+                statusDiv.className = "error";
+                return;
+            }
+
+            if (!file.name.endsWith(".csv")) {
+                statusDiv.textContent = "Invalid file type. Please upload a CSV file.";
+                statusDiv.className = "error";
+                return;
+            }
+
+            statusDiv.textContent = "Processing...";
+            statusDiv.className = ""; // Reset class
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csv = e.target.result;
+                const lines = csv.split("\n").filter(line => line.trim() !== ""); // Remove empty lines
+                if (lines.length <= 1) {
+                    statusDiv.textContent = "CSV file is empty or missing headers.";
+                    statusDiv.className = "error";
+                    return;
+                }
+
+                const headers = lines[0].split(",").map(header => header.trim());
+                const expectedHeaders = ["Name", "Email", "Phone", "Assigned To", "Location", "Source", "Status", "Notes"];
+
+                // Check if headers match expected headers
+                if (!expectedHeaders.every(header => headers.includes(header))) {
+                    statusDiv.textContent = `CSV headers do not match expected headers. Expected: ${expectedHeaders.join(", ")}`;
+                    statusDiv.className = "error";
+                    return;
+                }
+
+                let newLeads =;
+                let errors = 0;
+
+                for (let i = 1; i < lines.length; i++) {
+                    const data = lines[i].split(",").map(data => data.trim());
+                    if (data.length === headers.length) {
+                        const newLead = {};
+                        for (let j = 0; j < headers.length; j++) {
+                            newLead[headers[j]] = data[j];
+                        }
+                        newLeads.push(newLead);
+                    } else {
+                        errors++;
+                    }
+                }
+
+                if (errors > 0) {
+                    statusDiv.textContent = `Processed with ${errors} errors. Some rows were skipped due to incorrect formatting.`;
+                    statusDiv.className = "error";
+                } else {
+                    statusDiv.textContent = `Successfully processed ${newLeads.length} leads.`;
+                    statusDiv.className = "success";
+                }
+
+                // Add the new leads to the existing leads array
+                leads = leads.concat(newLeads);
+                localStorage.setItem("leads", JSON.stringify(leads));
+                renderLeads();
+            };
+            reader.onerror = function() {
+                statusDiv.textContent = "Error reading the file.";
+                statusDiv.className = "error";
+            };
+            reader.readAsText(file);
+        }
+        document.getElementById("uploadLeads").addEventListener("change", uploadLeads);
     </script>
 </body>
+
 </html>
