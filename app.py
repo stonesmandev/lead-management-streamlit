@@ -7,7 +7,7 @@ import io
 
 # Initialize session state
 if 'leads' not in st.session_state:
-    st.session_state.leads =
+    st.session_state.leads =# Corrected line
 
 # Function to download CSV
 def download_csv():
@@ -35,7 +35,7 @@ html_code = """
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width:device-width, initial-scale=1.0">
     <title>Lead Management</title>
     <style>
         /* CSS Reset */
