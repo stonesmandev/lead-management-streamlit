@@ -149,7 +149,6 @@
         <input type="file" id="uploadLeads" accept=".csv">
         <div id="upload-status"></div>
         <button onclick="downloadCSV()">Download Leads</button>
-        <button onclick="generateReminderLink()">Generate Reminder Link</button>
         <table id="leadsTable">
             <thead>
                 <tr>
@@ -240,18 +239,6 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        }
-
-        function generateReminderLink() {
-            const reminderText = prompt("Enter reminder text:");
-            if (reminderText) {
-                // Basic URL encoding of the reminder text
-                const encodedReminderText = encodeURIComponent(reminderText);
-                const reminderLink = `https://www.google.com/calendar/render?action=TEMPLATE&text=Reminder:%20${encodedReminderText}`;
-                navigator.clipboard.writeText(reminderLink).then(() => {
-                    alert("Reminder link copied to clipboard!");
-                });
-            }
         }
 
         function uploadLeads(event) {
