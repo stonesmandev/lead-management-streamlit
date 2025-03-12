@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lead Management System</title>
     <style>
-        /* Your existing CSS styles here */
         body {
             font-family: 'Inter', Arial, sans-serif;
             background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
@@ -121,19 +120,19 @@
                 <option value="Referral">Referral</option>
                 <option value="Property24">Property24</option>
             </select>
-            <select id = "status" required>
-                <option value = "">Lead Status</option>
-                <option value = "New">New</option>
-                <option value = "Contacted">Contacted</option>
-                <option value = "Qualified">Qualified</option>
-                <option value = "Negotiation">Negotiation</option>
-                <option value = "Closed - Won">Closed - Won</option>
-                <option value = "Closed - Lost">Closed - Lost</option>
+            <select id="status" required>
+                <option value="">Lead Status</option>
+                <option value="New">New</option>
+                <option value="Contacted">Contacted</option>
+                <option value="Qualified">Qualified</option>
+                <option value="Negotiation">Negotiation</option>
+                <option value="Closed - Won">Closed - Won</option>
+                <option value="Closed - Lost">Closed - Lost</option>
             </select>
-            <textarea id = "notes" placeholder = "Lead Notes"></textarea>
+            <textarea id="notes" placeholder="Lead Notes"></textarea>
             <input type="datetime-local" id="reminderDateTime" required>
             <button type="submit">Add Lead</button>
-            <button type = "button" onclick = "resetForm()">Clear Form</button>
+            <button type="button" onclick="resetForm()">Clear Form</button>
         </form>
         <button onclick="downloadCSV()">Download Leads</button>
         <button onclick="downloadICS()">Download Reminder</button>
@@ -153,7 +152,7 @@
                 </tr>
             </thead>
             <tbody>
-                </tbody>
+            </tbody>
         </table>
     </div>
     <script>
@@ -174,8 +173,8 @@
                 </tr>
             `).join("");
         }
-        function resetForm(){
-            document.getElementById("leadForm").reset()
+        function resetForm() {
+            document.getElementById("leadForm").reset();
         }
         document.getElementById("leadForm").addEventListener("submit", (e) => {
             e.preventDefault();
@@ -187,3 +186,14 @@
             const source = document.getElementById("source").value;
             const status = document.getElementById("status").value;
             const notes = document.getElementById("notes").value;
+            const reminderDateTime = document.getElementById("reminderDateTime").value;
+            const newLead = { name, email, phone, assignedTo, location, source, status, notes, reminderDateTime };
+            leads.push(newLead);
+            localStorage.setItem("leads", JSON.stringify(leads));
+            renderLeads();
+            document.getElementById("leadForm").reset();
+        });
+        function downloadCSV() {
+            const csvContent = "data:text/csv;charset=utf-8," +
+                ["Name", "Email", "Phone", "Assigned To", "Location", "Source", "Status", "Notes", "Reminder"].join(",") + "\n" +
+                leads.map(lead => [lead.name, lead.email,
