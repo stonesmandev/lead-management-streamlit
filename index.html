@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lead Management System (Enhanced)</title>
+    <title>Lead Management (Basic)</title>
     <style>
         /* CSS Reset */
         * {
@@ -13,7 +13,6 @@
             box-sizing: border-box;
         }
 
-        /* Your existing CSS styles here */
         body {
             font-family: 'Inter', Arial, sans-serif;
             background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
@@ -23,7 +22,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            box-sizing: border-box;
         }
 
         .glass-container {
@@ -43,9 +41,8 @@
             margin-bottom: 20px;
         }
 
-        input,
-        select,
-        textarea {
+        form input,
+        form textarea {
             margin: 10px 0;
             padding: 12px;
             width: calc(100% - 24px);
@@ -57,13 +54,13 @@
             color: #333;
         }
 
-        input::placeholder,
-        textarea::placeholder {
+        form input::placeholder,
+        form textarea::placeholder {
             color: #666;
         }
 
-        button {
-            margin: 10px 5px;
+        form button {
+            margin: 10px 0;
             padding: 12px 24px;
             background: rgba(0, 123, 255, 0.8);
             color: white;
@@ -74,7 +71,7 @@
             transition: background 0.3s ease;
         }
 
-        button:hover {
+        form button:hover {
             background: rgba(0, 123, 255, 1);
         }
 
@@ -103,138 +100,70 @@
         tr:hover {
             background: rgba(255, 255, 255, 0.3);
         }
-
-        #upload-status {
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: #555;
-        }
-
-        .error {
-            color: red;
-        }
-
-        .success {
-            color: green;
-        }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <div class="glass-container">
-        <h1>Lead Management System (Enhanced)</h1>
+        <h1>Add Lead</h1>
         <form id="leadForm">
-            <input type="text" id="name" placeholder="Name" required>
-            <input type="email" id="email" placeholder="Email" required>
-            <input type="tel" id="phone" placeholder="Phone" required>
-            <select id="assignedTo" required>
-                <option value="">Assign To</option>
-                <option value="Joshua">Joshua</option>
-                <option value="Joseph">Joseph</option>
-                <option value="Nettie">Nettie</option>
-            </select>
-            <select id="location" required>
-                <option value="">Location</option>
-                <option value="Bedfordview Frontier">Bedfordview Frontier</option>
-                <option value="Royce Heights">Royce Heights</option>
-            </select>
-            <select id="source" required>
-                <option value="">Lead Source</option>
-                <option value="Social Media">Social Media</option>
-                <option value="Walk-in">Walk-in</option>
-                <option value="Google">Google</option>
-                <option value="Referral">Referral</option>
-                <option value="Property24">Property24</option>
-            </select>
-            <select id="status" required>
-                <option value="">Lead Status</option>
-                <option value="New">New</option>
-                <option value="Contacted">Contacted</option>
-                <option value="Qualified">Qualified</option>
-                <option value="Negotiation">Negotiation</option>
-                <option value="Closed - Won">Closed - Won</option>
-                <option value="Closed - Lost</option>
-            </select>
-            <textarea id="notes" placeholder="Lead Notes"></textarea>
+            <input type="text" id="name" placeholder="Name" required><br><br>
+            <input type="email" id="email" placeholder="Email" required><br><br>
+            <input type="tel" id="phone" placeholder="Phone" required><br><br>
+            <textarea id="notes" placeholder="Notes"></textarea><br><br>
             <button type="submit">Add Lead</button>
-            <button type="button" onclick="resetForm()">Clear Form</button>
         </form>
-        <input type="file" id="uploadLeads" accept=".csv">
-        <div id="upload-status"></div>
-        <button onclick="downloadCSV()">Download Leads</button>
+
         <table id="leadsTable">
             <thead>
                 <tr>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
-                    <th>Assigned To</th>
-                    <th>Location</th>
-                    <th>Source</th>
-                    <th>Status</th>
                     <th>Notes</th>
                 </tr>
             </thead>
             <tbody>
             </tbody>
         </table>
+
+        <button onclick="downloadCSV()">Download CSV</button>
     </div>
+
     <script>
-        let leads = JSON.parse(localStorage.getItem("leads")) ||;
+        const leadForm = document.getElementById('leadForm');
+        const leadsTable = document.getElementById('leadsTable').getElementsByTagName('tbody')[0];
+
+        // Load leads from local storage
+        let leads = JSON.parse(localStorage.getItem('leads')) ||;
         renderLeads();
 
         function renderLeads() {
-            const tbody = document.querySelector("#leadsTable tbody");
-            tbody.innerHTML = leads.map(lead => `
-                <tr>
-                    <td>${lead.name}</td>
-                    <td>${lead.email}</td>
-                    <td>${lead.phone}</td>
-                    <td>${lead.assignedTo}</td>
-                    <td>${lead.location}</td>
-                    <td>${lead.source}</td>
-                    <td>${lead.status}</td>
-                    <td>${lead.notes}</td>
-                </tr>
-            `).join("");
+            leadsTable.innerHTML = '';
+
+            leads.forEach(lead => {
+                let row = leadsTable.insertRow();
+                row.insertCell(0).textContent = lead.name;
+                row.insertCell(1).textContent = lead.email;
+                row.insertCell(2).textContent = lead.phone;
+                row.insertCell(3).textContent = lead.notes;
+            });
         }
 
-        function resetForm() {
-            document.getElementById("leadForm").reset();
-        }
-
-        document.getElementById("leadForm").addEventListener("submit", (e) => {
-            e.preventDefault();
-            const name = document.getElementById("name").value;
-            const email = document.getElementById("email").value;
-            const phone = document.getElementById("phone").value;
-            const assignedTo = document.getElementById("assignedTo").value;
-            const location = document.getElementById("location").value;
-            const source = document.getElementById("source").value;
-            const status = document.getElementById("status").value;
-            const notes = document.getElementById("notes").value;
-
-            // Simple email validation
-            if (!email.includes("@")) {
-                alert("Invalid email format");
-                return;
-            }
+        leadForm.addEventListener('submit', function(event) {
+            event.preventDefault();
 
             const newLead = {
-                name,
-                email,
-                phone,
-                assignedTo,
-                location,
-                source,
-                status,
-                notes
+                name: leadForm.name.value,
+                email: leadForm.email.value,
+                phone: leadForm.phone.value,
+                notes: leadForm.notes.value
             };
+
             leads.push(newLead);
-            localStorage.setItem("leads", JSON.stringify(leads));
+            localStorage.setItem('leads', JSON.stringify(leads));
             renderLeads();
-            document.getElementById("leadForm").reset();
+            leadForm.reset();
         });
 
         function downloadCSV() {
@@ -244,8 +173,8 @@
             }
 
             const csvContent = "data:text/csv;charset=utf-8," +
-                ["Name", "Email", "Phone", "Assigned To", "Location", "Source", "Status", "Notes"].join(",") + "\n" +
-                leads.map(lead => [lead.name, lead.email, lead.phone, lead.assignedTo, lead.location, lead.source, lead.status, lead.notes].join(",")).join("\n");
+                ["Name", "Email", "Phone", "Notes"].join(",") + "\n" +
+                leads.map(lead => [lead.name, lead.email, lead.phone, lead.notes].join(",")).join("\n");
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
@@ -254,82 +183,6 @@
             link.click();
             document.body.removeChild(link);
         }
-
-        function uploadLeads(event) {
-            const file = event.target.files[0];
-            const statusDiv = document.getElementById("upload-status");
-
-            if (!file) {
-                statusDiv.textContent = "No file selected.";
-                statusDiv.className = "error";
-                return;
-            }
-
-            if (!file.name.endsWith(".csv")) {
-                statusDiv.textContent = "Invalid file type. Please upload a CSV file.";
-                statusDiv.className = "error";
-                return;
-            }
-
-            statusDiv.textContent = "Processing...";
-            statusDiv.className = ""; // Reset class
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const csv = e.target.result;
-                const lines = csv.split("\n").filter(line => line.trim() !== ""); // Remove empty lines
-                if (lines.length <= 1) {
-                    statusDiv.textContent = "CSV file is empty or missing headers.";
-                    statusDiv.className = "error";
-                    return;
-                }
-
-                const headers = lines[0].split(",").map(header => header.trim());
-                const expectedHeaders = ["Name", "Email", "Phone", "Assigned To", "Location", "Source", "Status", "Notes"];
-
-                // Check if headers match expected headers
-                if (!expectedHeaders.every(header => headers.includes(header))) {
-                    statusDiv.textContent = `CSV headers do not match expected headers. Expected: ${expectedHeaders.join(", ")}`;
-                    statusDiv.className = "error";
-                    return;
-                }
-
-                let newLeads =;
-                let errors = 0;
-
-                for (let i = 1; i < lines.length; i++) {
-                    const data = lines[i].split(",").map(data => data.trim());
-                    if (data.length === headers.length) {
-                        const newLead = {};
-                        for (let j = 0; j < headers.length; j++) {
-                            newLead[headers[j]] = data[j];
-                        }
-                        newLeads.push(newLead);
-                    } else {
-                        errors++;
-                    }
-                }
-
-                if (errors > 0) {
-                    statusDiv.textContent = `Processed with ${errors} errors. Some rows were skipped due to incorrect formatting.`;
-                    statusDiv.className = "error";
-                } else {
-                    statusDiv.textContent = `Successfully processed ${newLeads.length} leads.`;
-                    statusDiv.className = "success";
-                }
-
-                // Add the new leads to the existing leads array
-                leads = leads.concat(newLeads);
-                localStorage.setItem("leads", JSON.stringify(leads));
-                renderLeads();
-            };
-            reader.onerror = function() {
-                statusDiv.textContent = "Error reading the file.";
-                statusDiv.className = "error";
-            };
-            reader.readAsText(file);
-        }
-        document.getElementById("uploadLeads").addEventListener("change", uploadLeads);
     </script>
 </body>
 
